@@ -99,6 +99,22 @@
             display: flex;
             gap: 10px;
         }
+        .close-button {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 3px;
+    }
+
+    .close-button:hover,
+    .close-button:focus {
+        background-color: #d32f2f;
+    }
     </style>
     <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
@@ -159,7 +175,7 @@
 
     <div id="addStudentModal" class="modal">
         <div class="modal-content">
-            <span class="close" onclick="closeAddStudentModal()">&times;</span>
+            <button class="close-button" onclick="closeAddStudentModal()">Close</button>
             <form id="addStudentForm" method="POST" onsubmit="return checkDuplicate(event)">
                 @csrf
                 <!-- Hidden input field for operation type -->
@@ -168,10 +184,11 @@
                 <input type="text" id="name" name="name" placeholder="Name" required style="margin-bottom: 10px; width: 100%; padding: 8px;">
                 <input type="text" id="subject" name="subject" placeholder="Subject" required style="margin-bottom: 10px; width: 100%; padding: 8px;">
                 <input type="number" id="marks" name="marks" placeholder="Marks" required style="margin-bottom: 10px; width: 100%; padding: 8px;">
-                <button type="submit">Add Student</button>
+                <button type="submit">Add </button>
             </form>
         </div>
     </div>
+    
     <script>
         function showAddStudentModal() {
             var modal = document.getElementById('addStudentModal');
