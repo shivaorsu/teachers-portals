@@ -99,7 +99,6 @@
             display: flex;
             gap: 10px;
         }
-        
     </style>
     <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
@@ -146,8 +145,10 @@
                             <input type="text" name="name" value="{{ $student->name }}" required>
                             <input type="text" name="subject" value="{{ $student->subject }}" required>
                             <input type="number" name="marks" value="{{ $student->marks }}" required>
-                            <button type="submit">Save</button>
-                            <button type="button" onclick="cancelEdit({{ $student->id }})">Cancel</button>
+                            <div class="button-container">
+                                <button type="submit">Save</button>
+                                <button type="button" onclick="cancelEdit({{ $student->id }})">Cancel</button>
+                            </div>
                         </form>
                     </td>
                 </tr>
@@ -159,7 +160,7 @@
     <div id="addStudentModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeAddStudentModal()">&times;</span>
-            <form id="addStudentForm" method="POST" action="{{ route('students.store') }}" onsubmit="return validateForm()">
+            <form id="addStudentForm" method="POST" onsubmit="return checkDuplicate(event)">
                 @csrf
                 <!-- Hidden input field for operation type -->
                 <input type="hidden" id="operationType" name="operationType" value="add">
@@ -171,7 +172,6 @@
             </form>
         </div>
     </div>
-    <script src="{{ asset('js/app.js') }}" defer></script>
     <script>
         function showAddStudentModal() {
             var modal = document.getElementById('addStudentModal');
@@ -183,56 +183,42 @@
             modal.style.display = 'none';
         }
 
-        function checkDuplicate() {
-        var name = document.getElementById('name').value;
-        var subject = document.getElementById('subject').value;
-        var marks = document.getElementById('marks').value;
+        async function checkDuplicate(event) {
+            event.preventDefault();
 
-        // Perform AJAX request to check if student already exists
-        axios.post('{{ route("students.checkDuplicate") }}', {
-            name: name,
-            subject: subject
-        })
-        .then(function (response) {
-            if (response.data.exists) {
-                // Student with same name and subject exists, confirm update
-                if (confirm('Student with the same name and subject exists. Do you want to update marks?')) {
-                    // Set operation type to update
-                    document.getElementById('operationType').value = 'update';
-                    // Submit form
-                    document.getElementById('addStudentForm').submit();
+            var name = document.getElementById('name').value;
+            var subject = document.getElementById('subject').value;
+
+            try {
+                // Perform AJAX request to check if student already exists
+                let response = await axios.post('{{ route("students.checkDuplicate") }}', {
+                    name: name,
+                    subject: subject
+                });
+
+                if (response.data.exists) {
+                    // Student with same name and subject exists, confirm update
+                    if (confirm('Student with the same name and subject exists. Do you want to update marks?')) {
+                        // Set operation type to update
+                        document.getElementById('operationType').value = 'update';
+                    } else {
+                        return false;
+                    }
+                } else {
+                    // No existing student found, submit form for addition
+                    document.getElementById('operationType').value = 'add';
                 }
-            } else {
-                // No existing student found, submit form for addition
-                document.getElementById('operationType').value = 'add';
+
+                // Submit the form after the check
                 document.getElementById('addStudentForm').submit();
+            } catch (error) {
+                console.error('Error checking duplicate:', error);
+                alert('An error occurred while checking for duplicates. Please try again.');
+                return false;
             }
-        })
-        .catch(function (error) {
-            console.error('Error checking duplicate:', error);
-            // Handle error scenario
-        });
-    }
-    function validateForm() {
-        var name = document.getElementById('name').value.trim();
-        var subject = document.getElementById('subject').value.trim();
-        var marks = document.getElementById('marks').value.trim();
-
-        // Basic validation
-        if (name === '' || subject === '' || marks === '') {
-            alert('Please fill in all fields.');
-            return false;
         }
 
-        // Additional validation (e.g., marks should be a number)
-        if (isNaN(marks)) {
-            alert('Marks must be a number.');
-            return false;
-        }
-
-        return true; // Form submission allowed
-    }
-function editStudent(button) {
+        function editStudent(button) {
             var row = button.parentNode.parentNode;
             var editRow = document.getElementById('editRow' + row.dataset.id);
             
