@@ -9,7 +9,7 @@ class Student extends Model
 {
     use HasFactory;
 
-    protected $table = 'student'; // Capital 'S' matches your actual table name
+    protected $table = 'student'; 
 
     protected $fillable = [
         'name', 'subject', 'marks',

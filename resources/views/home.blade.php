@@ -159,35 +159,35 @@
             </thead>
             <tbody>
                 @foreach ($students as $student)
-                    <tr data-id="{{ $student->id }}">
-                        <td class="name">{{ $student->name }}</td>
-                        <td class="subject">{{ $student->subject }}</td>
-                        <td class="marks">{{ $student->marks }}</td>
-                        <td>
-                            <button onclick="editStudent(this)">Edit</button>
-                            <form method="POST" action="{{ route('students.destroy', $student->id) }}">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <!-- Edit form initially hidden -->
-                    <tr id="editRow{{ $student->id }}" style="display: none;">
-                        <td colspan="4">
-                            <form method="POST" action="{{ route('students.update', $student->id) }}">
-                                @csrf
-                                @method('PUT')
-                                <input type="text" name="name" value="{{ $student->name }}" required>
-                                <input type="text" name="subject" value="{{ $student->subject }}" required>
-                                <input type="number" name="marks" value="{{ $student->marks }}" required>
-                                <div class="button-container">
-                                    <button type="submit">Save</button>
-                                    <button type="button" onclick="cancelEdit({{ $student->id }})">Cancel</button>
-                                </div>
-                            </form>
-                        </td>
-                    </tr>
+                <tr data-id="{{ $student->id }}">
+                    <td class="name">{{ $student->name }}</td>
+                    <td class="subject">{{ $student->subject }}</td>
+                    <td class="marks">{{ $student->marks }}</td>
+                    <td>
+                        <button onclick="editStudent(this)">Edit</button>
+                        <form method="POST" action="{{ route('students.destroy', $student->id) }}">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+
+                <tr id="editRow{{ $student->id }}" style="display: none;">
+                    <td colspan="4">
+                        <form method="POST" action="{{ route('students.update', $student->id) }}">
+                            @csrf
+                            @method('PUT')
+                            <input type="text" name="name" value="{{ $student->name }}" required>
+                            <input type="text" name="subject" value="{{ $student->subject }}" required>
+                            <input type="number" name="marks" value="{{ $student->marks }}" required>
+                            <div class="button-container">
+                                <button type="submit">Save</button>
+                                <button type="button" onclick="cancelEdit({{ $student->id }})">Cancel</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
                 @endforeach
             </tbody>
         </table>
@@ -198,10 +198,9 @@
             <button class="close-button" onclick="closeAddStudentModal()">Close</button>
             <form id="addStudentForm" method="POST" action="{{ route('students.store') }}"
                 onsubmit="return checkDuplicate(event)">
-                
+
                 @csrf
-                @csrf
-                <!-- Hidden input field for operation type -->
+
                 <input type="hidden" id="operationType" name="operationType" value="add">
                 <h2>Add New Student</h2>
                 <input type="text" id="name" name="name" placeholder="Name" required
@@ -210,8 +209,18 @@
                     style="margin-bottom: 10px; width: 100%; padding: 8px;">
                 <input type="number" id="marks" name="marks" placeholder="Marks" required
                     style="margin-bottom: 10px; width: 100%; padding: 8px;">
-                <button type="submit">Add </button>
+                <button type="submit">Add</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal for Duplicate Student -->
+    <div id="duplicateStudentModal" class="modal">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeDuplicateStudentModal()">Close</button>
+            {{-- <span class="close" >&times;</span> --}}
+            <h2>Duplicate Student</h2>
+            <p>A student with the same name and subject already exists.</p>
         </div>
     </div>
 
@@ -223,6 +232,11 @@
 
         function closeAddStudentModal() {
             var modal = document.getElementById('addStudentModal');
+            modal.style.display = 'none';
+        }
+
+        function closeDuplicateStudentModal() {
+            var modal = document.getElementById('duplicateStudentModal');
             modal.style.display = 'none';
         }
 
@@ -239,12 +253,11 @@
                 });
 
                 if (response.data.exists) {
-                    // Handle existing student case
-                    alert('Student with the same name and subject exists.');
-                    return false;
+                    var modal = document.getElementById('duplicateStudentModal');
+                    modal.style.display = 'block';
+                    return false; // Stop form submission
                 } else {
-                    // No duplicate found, proceed with form submission
-                    document.getElementById('addStudentForm').submit();
+                    document.getElementById('addStudentForm').submit(); // Proceed with form submission
                 }
             } catch (error) {
                 console.error('Error checking duplicate:', error);
@@ -257,7 +270,6 @@
             var row = button.parentNode.parentNode;
             var editRow = document.getElementById('editRow' + row.dataset.id);
 
-
             row.style.display = 'none';
             editRow.style.display = 'table-row';
         }
@@ -265,7 +277,6 @@
         function cancelEdit(studentId) {
             var editRow = document.getElementById('editRow' + studentId);
             var originalRow = editRow.previousElementSibling;
-
 
             originalRow.style.display = 'table-row';
             editRow.style.display = 'none';
