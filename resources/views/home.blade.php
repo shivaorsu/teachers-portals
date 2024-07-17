@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Teacher Portal</title>
     <style>
@@ -9,6 +10,7 @@
             margin: 0;
             padding: 0;
         }
+
         .portal-container {
             max-width: 800px;
             margin: 20px auto;
@@ -17,9 +19,11 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         .portal-container h2 {
             color: #333;
         }
+
         .portal-container button {
             padding: 10px 20px;
             background-color: #007bff;
@@ -27,19 +31,24 @@
             border: none;
             cursor: pointer;
         }
+
         .portal-container button:hover {
             background-color: #0056b3;
         }
+
         table {
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
         }
-        table th, table td {
+
+        table th,
+        table td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -51,6 +60,7 @@
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.4);
         }
+
         .modal-content {
             background-color: #fefefe;
             margin: 15% auto;
@@ -61,9 +71,11 @@
             position: relative;
             border-radius: 5px;
         }
+
         .modal-content h2 {
             margin-top: 0;
         }
+
         .close {
             position: absolute;
             right: 10px;
@@ -73,18 +85,22 @@
             font-weight: bold;
             cursor: pointer;
         }
+
         .close:hover,
         .close:focus {
             color: #333;
             text-decoration: none;
             cursor: pointer;
         }
+
         .close:before {
             content: "&times;";
         }
+
         form {
             margin-bottom: 0;
         }
+
         form button[type="submit"] {
             background-color: #28a745;
             color: #fff;
@@ -92,32 +108,36 @@
             padding: 10px 20px;
             cursor: pointer;
         }
+
         form button[type="submit"]:hover {
             background-color: #218838;
         }
+
         .button-container {
             display: flex;
             gap: 10px;
         }
-        .close-button {
-        position: absolute;
-        right: 10px;
-        top: 10px;
-        background-color: #f44336;
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        cursor: pointer;
-        border-radius: 3px;
-    }
 
-    .close-button:hover,
-    .close-button:focus {
-        background-color: #d32f2f;
-    }
+        .close-button {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            background-color: #d32f2f;
+        }
     </style>
     <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
+
 <body>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
@@ -138,36 +158,36 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($students as $student)
-                <tr data-id="{{ $student->id }}">
-                    <td class="name">{{ $student->name }}</td>
-                    <td class="subject">{{ $student->subject }}</td>
-                    <td class="marks">{{ $student->marks }}</td>
-                    <td>
-                        <button onclick="editStudent(this)">Edit</button>
-                        <form method="POST" action="{{ route('students.destroy', $student->id) }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-                <!-- Edit form initially hidden -->
-                <tr id="editRow{{ $student->id }}" style="display: none;">
-                    <td colspan="4">
-                        <form method="POST" action="{{ route('students.update', $student->id) }}">
-                            @csrf
-                            @method('PUT')
-                            <input type="text" name="name" value="{{ $student->name }}" required>
-                            <input type="text" name="subject" value="{{ $student->subject }}" required>
-                            <input type="number" name="marks" value="{{ $student->marks }}" required>
-                            <div class="button-container">
-                                <button type="submit">Save</button>
-                                <button type="button" onclick="cancelEdit({{ $student->id }})">Cancel</button>
-                            </div>
-                        </form>
-                    </td>
-                </tr>
+                @foreach ($students as $student)
+                    <tr data-id="{{ $student->id }}">
+                        <td class="name">{{ $student->name }}</td>
+                        <td class="subject">{{ $student->subject }}</td>
+                        <td class="marks">{{ $student->marks }}</td>
+                        <td>
+                            <button onclick="editStudent(this)">Edit</button>
+                            <form method="POST" action="{{ route('students.destroy', $student->id) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <!-- Edit form initially hidden -->
+                    <tr id="editRow{{ $student->id }}" style="display: none;">
+                        <td colspan="4">
+                            <form method="POST" action="{{ route('students.update', $student->id) }}">
+                                @csrf
+                                @method('PUT')
+                                <input type="text" name="name" value="{{ $student->name }}" required>
+                                <input type="text" name="subject" value="{{ $student->subject }}" required>
+                                <input type="number" name="marks" value="{{ $student->marks }}" required>
+                                <div class="button-container">
+                                    <button type="submit">Save</button>
+                                    <button type="button" onclick="cancelEdit({{ $student->id }})">Cancel</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
@@ -176,19 +196,25 @@
     <div id="addStudentModal" class="modal">
         <div class="modal-content">
             <button class="close-button" onclick="closeAddStudentModal()">Close</button>
-            <form id="addStudentForm" method="POST" onsubmit="return checkDuplicate(event)">
+            <form id="addStudentForm" method="POST" action="{{ route('students.store') }}"
+                onsubmit="return checkDuplicate(event)">
+                
+                @csrf
                 @csrf
                 <!-- Hidden input field for operation type -->
                 <input type="hidden" id="operationType" name="operationType" value="add">
                 <h2>Add New Student</h2>
-                <input type="text" id="name" name="name" placeholder="Name" required style="margin-bottom: 10px; width: 100%; padding: 8px;">
-                <input type="text" id="subject" name="subject" placeholder="Subject" required style="margin-bottom: 10px; width: 100%; padding: 8px;">
-                <input type="number" id="marks" name="marks" placeholder="Marks" required style="margin-bottom: 10px; width: 100%; padding: 8px;">
+                <input type="text" id="name" name="name" placeholder="Name" required
+                    style="margin-bottom: 10px; width: 100%; padding: 8px;">
+                <input type="text" id="subject" name="subject" placeholder="Subject" required
+                    style="margin-bottom: 10px; width: 100%; padding: 8px;">
+                <input type="number" id="marks" name="marks" placeholder="Marks" required
+                    style="margin-bottom: 10px; width: 100%; padding: 8px;">
                 <button type="submit">Add </button>
             </form>
         </div>
     </div>
-    
+
     <script>
         function showAddStudentModal() {
             var modal = document.getElementById('addStudentModal');
@@ -207,27 +233,19 @@
             var subject = document.getElementById('subject').value;
 
             try {
-                // Perform AJAX request to check if student already exists
-                let response = await axios.post('{{ route("students.checkDuplicate") }}', {
+                let response = await axios.post('{{ route('students.checkDuplicate') }}', {
                     name: name,
                     subject: subject
                 });
 
                 if (response.data.exists) {
-                    // Student with same name and subject exists, confirm update
-                    if (confirm('Student with the same name and subject exists. Do you want to update marks?')) {
-                        // Set operation type to update
-                        document.getElementById('operationType').value = 'update';
-                    } else {
-                        return false;
-                    }
+                    // Handle existing student case
+                    alert('Student with the same name and subject exists.');
+                    return false;
                 } else {
-                    // No existing student found, submit form for addition
-                    document.getElementById('operationType').value = 'add';
+                    // No duplicate found, proceed with form submission
+                    document.getElementById('addStudentForm').submit();
                 }
-
-                // Submit the form after the check
-                document.getElementById('addStudentForm').submit();
             } catch (error) {
                 console.error('Error checking duplicate:', error);
                 alert('An error occurred while checking for duplicates. Please try again.');
@@ -238,8 +256,8 @@
         function editStudent(button) {
             var row = button.parentNode.parentNode;
             var editRow = document.getElementById('editRow' + row.dataset.id);
-            
-            // Hide current row, show edit form row
+
+
             row.style.display = 'none';
             editRow.style.display = 'table-row';
         }
@@ -247,11 +265,12 @@
         function cancelEdit(studentId) {
             var editRow = document.getElementById('editRow' + studentId);
             var originalRow = editRow.previousElementSibling;
-            
-            // Show original row, hide edit form row
+
+
             originalRow.style.display = 'table-row';
             editRow.style.display = 'none';
         }
     </script>
 </body>
+
 </html>
